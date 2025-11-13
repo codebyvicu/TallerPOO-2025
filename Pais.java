@@ -1,38 +1,79 @@
+package com.taller.proyecto.logica;
+
+import java.util.*;
+
 public class Pais {
- /**
- * Representa un país donde puede residir una escudería o realizarse una carrera.
- */
     private int idPais;
     private String descripcion;
+    private List <Escuderia> escuderias;
+    private List <Persona> personas;
+    private List <Circuito> circuitos;
+    private List <Carrera> carreras;
 
-    // Constructor
-    public Pais(int idPais, String descripcion) {
+    public Pais(){
+        this.escuderias = new ArrayList <>();
+        this.personas = new ArrayList <>();
+        this.circuitos = new ArrayList<>();
+        this.carreras = new ArrayList<>();
+    }
+
+    public Pais(int idPais, String descripcion){
         this.idPais = idPais;
         this.descripcion = descripcion;
     }
 
-    // Getters y Setters
-    public int getIdPais() {
-        return idPais;
-    }
-
-    public void setIdPais(int idPais) {
+    public Pais(int idPais, String descripcion, List <Escuderia> escuderias, List <Persona> personas, List <Circuito> circuitos, List <Carrera> carreras) {
         this.idPais = idPais;
+        this.descripcion = descripcion;
+        this.escuderias = escuderias;
+        this.personas = personas;
+        this.circuitos = circuitos;
+        this.carreras = carreras;
     }
 
+    public int getIdPais() {
+        return this.idPais;
+    }
     public String getDescripcion() {
-        return descripcion;
+        return this.descripcion;
+    }
+    public List <Escuderia> getEscuderias(){
+        return this.escuderias;
+    }
+    public List <Persona> getPersonas(){
+        return this.personas;
+    }
+    public List <Circuito> getCircuitos(){
+        return this.circuitos;
+    }
+    public List <Carrera> getCarreras(){
+        return this.carreras;
     }
 
     public void setDescripcion(String descripcion) {
         this.descripcion = descripcion;
     }
-
-    // toString
-    @Override
-    public String toString() {
-        return "Pais [idPais=" + idPais + ", descripcion=" + descripcion + "]";
+    public void setIdPais(int idPais) {
+        this.idPais = idPais;
     }
+
+    public void agregarEscuderia (Escuderia e){
+        this.escuderias.add (e);
+    }
+    public void agregarPersona (Persona p){
+        this.personas.add (p);
+    }
+    public void agregarCircuito (Circuito c){
+        this.circuitos.add (c);
+    }
+    public void agregarCarrera (Carrera c){
+        this.carreras.add (c);
+    }
+
 }
+
+
+
+
 
 
