@@ -104,26 +104,48 @@ public class PanelRegistroMecanico extends JPanel {
             String apellido = txtApellido.getText().trim();
             Pais pais = (Pais) cmbPais.getSelectedItem();
             Especialidad especialidad = (Especialidad) cmbEspecialidad.getSelectedItem();
+            String aniosExpStr = txtAñosExp.getText().trim();
 
-            // 2. Validar y parsear números
-            int aniosExp = Integer.parseInt(txtAñosExp.getText().trim());
-
-            // 3. Validar que los campos no estén vacíos
-            if (dni.isEmpty() || nombre.isEmpty() || apellido.isEmpty() || pais == null || especialidad == null) {
+            // 2. Validar que los campos no estén vacíos
+            if (dni.isEmpty() || nombre.isEmpty() || apellido.isEmpty() || aniosExpStr.isEmpty() || pais == null || especialidad == null) {
                 JOptionPane.showMessageDialog(this, "Todos los campos son obligatorios.", "Error de Validación", JOptionPane.WARNING_MESSAGE);
                 return;
             }
+            
+            // --- INICIO DE VALIDACIONES ---
 
-            // 4. Llamar a la lógica de negocio
-            gestor.registrarMecanico(dni, nombre, apellido, pais, especialidad, aniosExp);
+            // 3. Validar DNI (SOLO NÚMEROS Y PUNTOS)
+            if (!esDNIValido(dni)) {
+                JOptionPane.showMessageDialog(this, "Error: El DNI debe contener solo números y puntos.", "Error de Formato", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
 
-            // 5. Mostrar éxito y limpiar formulario
+            // 4. Validar Nombre y Apellido (SOLO LETRAS)
+            if (!esSoloTexto(nombre) || !esSoloTexto(apellido)) {
+                JOptionPane.showMessageDialog(this, "Error: Nombre y Apellido deben contener solo letras.", "Error de Formato", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            // 5. Validar Años (SOLO NÚMEROS) - lo movemos antes de llamar a la lógica
+            int aniosExp;
+            try {
+                aniosExp = Integer.parseInt(aniosExpStr);
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(this, "Error: 'Años de Experiencia' debe ser un número válido.", "Error de Formato", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            
+            // --- FIN DE VALIDACIONES ---
+
+            // 6. Llamar a la lógica de negocio (Sabiendo que todos los datos son válidos)
+            gestor.registrarMecanico(dni, nombre, apellido, pais, especialidad, aniosExp); //
+
+            // 7. Mostrar éxito y limpiar formulario
             JOptionPane.showMessageDialog(this, "Mecánico " + apellido + " registrado exitosamente.", "Registro Exitoso", JOptionPane.INFORMATION_MESSAGE);
             limpiarFormulario();
 
-        } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(this, "Error: 'Años de Experiencia' debe ser un número válido.", "Error de Formato", JOptionPane.ERROR_MESSAGE);
         } catch (PersonaRepetidaException ex) { //
+            // Esto salta si el DNI ya existe en un Piloto o Mecánico
             JOptionPane.showMessageDialog(this, ex.getMessage(), "Error de Registro", JOptionPane.ERROR_MESSAGE);
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, "Ocurrió un error inesperado: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
@@ -138,4 +160,28 @@ public class PanelRegistroMecanico extends JPanel {
         cmbPais.setSelectedIndex(0);
         cmbEspecialidad.setSelectedIndex(0);
     }
-}
+
+
+    /**
+     * Método auxiliar para validar que un DNI contenga solo números y puntos.
+     * @param dni El string a validar.
+     * @return true si es válido, false si contiene letras u otros símbolos.
+     */
+    private boolean esDNIValido(String dni) {
+        // Esta regex valida que solo haya números (0-9) y el caracter punto (.).
+        return dni.matches("^[0-9.]+$");
+    }
+
+    /**
+     * Método auxiliar para validar que un string contenga solo letras,
+     * espacios y caracteres acentuados comunes.
+     * @param texto El string a validar.
+     * @return true si solo contiene letras, false si contiene números o símbolos.
+     */
+    private boolean esSoloTexto(String texto) {
+        // Esta es una expresión regular (regex) que valida letras
+        // (incluyendo áéíóúñ) y espacios.
+        return texto.matches("^[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+$");
+    }
+
+} 

@@ -16,6 +16,7 @@ public class Mecanico extends Persona{
         super(dni, nombre, apellido, pais);
         this.especialidad = especialidad;
         this.añosExperiencia = añosExperiencia;
+        this.escuderias = new ArrayList<>();
     }
     
     public Mecanico(String dni, String nombre, String apellido, Especialidad especialidad, int añosExperiencia, Pais pais, List <Escuderia> escuderias){

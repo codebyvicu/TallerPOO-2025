@@ -104,45 +104,68 @@ public class PanelRegistroPiloto extends JPanel {
         });
     }
 
-    private void registrarPiloto() {
+   private void registrarPiloto() {
         try {
             // 1. Obtener datos de la UI
-            String dni = txtDni.getText();
-            String nombre = txtNombre.getText();
-            String apellido = txtApellido.getText();
+            String dni = txtDni.getText().trim();
+            String nombre = txtNombre.getText().trim();
+            String apellido = txtApellido.getText().trim();
             Pais pais = (Pais) cmbPais.getSelectedItem();
+            
+            // Obtenemos los números como texto primero
+            String numCompStr = txtNumComp.getText().trim();
+            String victoriasStr = txtVictorias.getText().trim();
+            String polesStr = txtPoles.getText().trim();
+            String vueltasRapidasStr = txtVueltasRapidas.getText().trim();
+            String podiosStr = txtPodios.getText().trim();
 
-            // 2. Validar y parsear números
-            int numComp = Integer.parseInt(txtNumComp.getText());
-            int victorias = Integer.parseInt(txtVictorias.getText());
-            int poles = Integer.parseInt(txtPoles.getText());
-            int vueltasRapidas = Integer.parseInt(txtVueltasRapidas.getText());
-            int podios = Integer.parseInt(txtPodios.getText());
-
-            // 3. Validar que los campos no estén vacíos
-            if (dni.isEmpty() || nombre.isEmpty() || apellido.isEmpty() || pais == null) {
-                JOptionPane.showMessageDialog(this, "DNI, Nombre, Apellido y País no pueden estar vacíos.", "Error de Validación", JOptionPane.WARNING_MESSAGE);
+            // 2. Validar que los campos no estén vacíos
+            if (dni.isEmpty() || nombre.isEmpty() || apellido.isEmpty() || pais == null ||
+                numCompStr.isEmpty() || victoriasStr.isEmpty() || polesStr.isEmpty() ||
+                vueltasRapidasStr.isEmpty() || podiosStr.isEmpty()) {
+                
+                JOptionPane.showMessageDialog(this, "Todos los campos son obligatorios.", "Error de Validación", JOptionPane.WARNING_MESSAGE);
                 return;
             }
-            // --- INICIO DEL ARREGLO ---
-            // VALIDACIÓN: Comprobar que nombre y apellido sean solo texto
-            if (!esSoloTexto(nombre) || !esSoloTexto(apellido)) {
-                JOptionPane.showMessageDialog(this, "Error: Nombre y Apellido deben contener solo letras.", "Error de Formato", JOptionPane.ERROR_MESSAGE);
-                return; // Detenemos la ejecución, pero NO limpiamos el formulario
+
+            // --- INICIO DE VALIDACIONES DE FORMATO ---
+
+            // 3. Validar DNI (SOLO NÚMEROS Y PUNTOS)
+            if (!esDNIValido(dni)) {
+                JOptionPane.showMessageDialog(this, "Error: El DNI debe contener solo números y puntos.", "Error de Formato", JOptionPane.ERROR_MESSAGE);
+                return;
             }
 
-            // Llamar a la lógica de negocio
-            gestor.registrarPiloto(dni, nombre, apellido, numComp, victorias, poles, vueltasRapidas, podios, pais);
+            // 4. Validar Nombre y Apellido (SOLO LETRAS)
+            if (!esSoloTexto(nombre) || !esSoloTexto(apellido)) {
+                JOptionPane.showMessageDialog(this, "Error: Nombre y Apellido deben contener solo letras.", "Error de Formato", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
 
-            // Mostrar éxito y limpiar formulario
+            // 5. Validar campos numéricos
+            int numComp, victorias, poles, vueltasRapidas, podios;
+            try {
+                numComp = Integer.parseInt(numCompStr);
+                victorias = Integer.parseInt(victoriasStr);
+                poles = Integer.parseInt(polesStr);
+                vueltasRapidas = Integer.parseInt(vueltasRapidasStr);
+                podios = Integer.parseInt(podiosStr);
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(this, "Error: Los campos numéricos (N° Comp., Victorias, etc.) deben ser números válidos.", "Error de Formato", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            
+            // --- FIN DE VALIDACIONES DE FORMATO ---
+
+            // 6. Llamar a la lógica de negocio (Sabiendo que todos los datos son válidos)
+            gestor.registrarPiloto(dni, nombre, apellido, numComp, victorias, poles, vueltasRapidas, podios, pais); //
+
+            // 7. Mostrar éxito y limpiar formulario
             JOptionPane.showMessageDialog(this, "Piloto " + apellido + " registrado exitosamente.", "Registro Exitoso", JOptionPane.INFORMATION_MESSAGE);
             limpiarFormulario();
 
-        } catch (NumberFormatException ex) {
-            // Error si los números están mal escritos
-            JOptionPane.showMessageDialog(this, "Error: Los campos numéricos (victorias, podios, etc.) deben ser números válidos.", "Error de Formato", JOptionPane.ERROR_MESSAGE);
         } catch (PersonaRepetidaException ex) {
-            // Excepción personalizada de lógica
+            // Esto salta si el DNI ya existe en un Piloto o Mecánico
             JOptionPane.showMessageDialog(this, ex.getMessage(), "Error de Registro", JOptionPane.ERROR_MESSAGE);
         } catch (Exception ex) {
             // Cualquier otro error
@@ -162,7 +185,15 @@ public class PanelRegistroPiloto extends JPanel {
         cmbPais.setSelectedIndex(0);
     }
 
-    // ... (después de limpiarFormulario())
+    /**
+     * Método auxiliar para validar que un DNI contenga solo números y puntos.
+     * @param dni El string a validar.
+     * @return true si es válido, false si contiene letras u otros símbolos.
+     */
+    private boolean esDNIValido(String dni) {
+        // Esta regex valida que solo haya números (0-9) y el caracter punto (.).
+        return dni.matches("^[0-9.]+$");
+    }
 
     /**
      * Método auxiliar para validar que un string contenga solo letras,
@@ -171,7 +202,8 @@ public class PanelRegistroPiloto extends JPanel {
      * @return true si solo contiene letras, false si contiene números o símbolos.
      */
     private boolean esSoloTexto(String texto) {
-        // expresión regular (regex) que valida letras (incluyendo áéíóúñ) y espacios.
+        // Esta es una expresión regular (regex) que valida letras
+        // (incluyendo áéíóúñ) y espacios.
         return texto.matches("^[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+$");
     }
 

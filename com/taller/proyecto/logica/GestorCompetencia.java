@@ -310,7 +310,6 @@ public String mostrarHistoricoGeneralPilotos() {
  * Genera un informe detallando qué modelos de autos de cada escudería
  * fueron utilizados en qué carreras y por quién.
  */
-// La versión correcta que devuelve String
 public String generarInformeAutosPorEscuderia() {
     StringBuilder sb = new StringBuilder();
     sb.append("--- INFORME DE AUTOS UTILIZADOS POR ESCUDERÍA ---\n\n");
