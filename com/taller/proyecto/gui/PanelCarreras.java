@@ -22,6 +22,7 @@ public class PanelCarreras extends JPanel {
     private JCheckBox chkVueltaRapida;
     private JButton btnCargarResultado;
 
+    // ESTE ES EL CONSTRUCTOR QUE TE FALTABA
     public PanelCarreras(GestorCompetencia gestor) {
         this.gestor = gestor;
         // Layout principal de este panel
@@ -137,7 +138,7 @@ public class PanelCarreras extends JPanel {
             }
 
             // Llamamos a la lógica que ya arreglamos
-            gestor.registrarParticipacion(piloto, carrera, modelo); //
+            gestor.registrarParticipacion(piloto, carrera, modelo); 
 
             JOptionPane.showMessageDialog(this, "¡Piloto " + piloto.getApellido() + " inscrito en " + carrera.getCircuito().getNombre() + "!", "Inscripción Exitosa", JOptionPane.INFORMATION_MESSAGE);
             txtModeloAuto.setText("");
@@ -184,7 +185,6 @@ public class PanelCarreras extends JPanel {
         for (Piloto p : gestor.getPilotos()) {
             comboBox.addItem(p);
         }
-        // Usamos un Renderer para que se vea "Apellido, Nombre"
         comboBox.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
@@ -202,18 +202,37 @@ public class PanelCarreras extends JPanel {
         for (Carrera c : gestor.getCarreras()) {
             comboBox.addItem(c);
         }
-        // Usamos un Renderer para que se vea "Fecha - Circuito"
         comboBox.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (value instanceof Carrera) {
                     Carrera c = (Carrera) value;
-                    // Asumimos que circuito no es null
-                    setText(c.getFechaRealizacion() + " - " + c.getCircuito().getNombre());
+                    if (c.getCircuito() != null) {
+                         setText(c.getFechaRealizacion() + " - " + c.getCircuito().getNombre());
+                    } else {
+                         setText(c.getFechaRealizacion() + " - (Circuito no asignado)");
+                    }
                 }
                 return this;
             }
         });
+    }
+
+    /**
+     * Método público para forzar la recarga de los ComboBox de carreras.
+     */
+    public void actualizarListasDeCarreras() {
+        Object pilotoSel = cmbPilotoInsc.getSelectedItem();
+        Object carreraSel = cmbCarreraInsc.getSelectedItem();
+
+        cmbCarreraInsc.removeAllItems();
+        cmbCarreraRes.removeAllItems();
+        
+        poblarComboBoxCarreras(cmbCarreraInsc);
+        poblarComboBoxCarreras(cmbCarreraRes);
+
+        cmbPilotoInsc.setSelectedItem(pilotoSel);
+        cmbCarreraInsc.setSelectedItem(carreraSel);
     }
 }

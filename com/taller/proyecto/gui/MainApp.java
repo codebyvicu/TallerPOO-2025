@@ -42,17 +42,30 @@ public class MainApp extends JFrame {
         JTabbedPane tabbedPane = new JTabbedPane();
 
         // 5. Añadir las pestañas (Panels)
-        // Pasamos el gestor (ya cargado con datos) a cada panel
         tabbedPane.addTab("Ranking Pilotos", new PanelRanking(gestor));
-        tabbedPane.addTab("Registrar Piloto", new PanelRegistroPiloto(gestor));
-        tabbedPane.addTab("Registrar Mecánico", new PanelRegistroMecanico(gestor));
-        tabbedPane.addTab("Registrar Auto", new PanelRegistroAuto(gestor));
-        tabbedPane.addTab("Registrar Escudería", new PanelRegistroEscuderia(gestor));
-        tabbedPane.addTab("Registrar Circuito", new PanelRegistroCircuito(gestor));
-        tabbedPane.addTab("Registrar País", new PanelRegistroPais(gestor));
+        
+        // --- Agrupamos las pestañas de Registro ---
+        tabbedPane.addTab("Reg. Piloto", new PanelRegistroPiloto(gestor));
+        tabbedPane.addTab("Reg. Mecánico", new PanelRegistroMecanico(gestor));
+        tabbedPane.addTab("Reg. Auto", new PanelRegistroAuto(gestor));
+        tabbedPane.addTab("Reg. Escudería", new PanelRegistroEscuderia(gestor));
+        tabbedPane.addTab("Reg. Circuito", new PanelRegistroCircuito(gestor));
+        tabbedPane.addTab("Reg. País", new PanelRegistroPais(gestor));
+        tabbedPane.addTab("Visor de Datos", new PanelVisorDatos(gestor));
+        
+        // --- Pestañas de Gestión (CON LÓGICA DE REFERENCIA) ---
         tabbedPane.addTab("Informes", new PanelInformes(gestor));
-        tabbedPane.addTab("Gestión de Carreras", new PanelCarreras(gestor));
-        tabbedPane.addTab("Planificar Carrera", new PanelPlanificarCarrera(gestor));
+
+        // 1. Creamos PanelCarreras y lo guardamos en una variable
+        PanelCarreras panelCarreras = new PanelCarreras(gestor);
+        
+        // 2. Creamos PanelPlanificarCarrera y le pasamos la referencia al panel anterior
+        PanelPlanificarCarrera panelPlanificar = new PanelPlanificarCarrera(gestor, panelCarreras);
+        
+        // 3. Agregamos los paneles al tabbedPane
+        tabbedPane.addTab("Gestión de Carreras", panelCarreras);
+        tabbedPane.addTab("Planificar Carrera", panelPlanificar);
+        
         tabbedPane.addTab("Asociar Piloto-Escudería", new PanelAsociarPiloto(gestor));
         
         // --- TAREAS PENDIENTES ---

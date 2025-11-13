@@ -124,11 +124,17 @@ public class PanelRegistroPiloto extends JPanel {
                 JOptionPane.showMessageDialog(this, "DNI, Nombre, Apellido y País no pueden estar vacíos.", "Error de Validación", JOptionPane.WARNING_MESSAGE);
                 return;
             }
+            // --- INICIO DEL ARREGLO ---
+            // VALIDACIÓN: Comprobar que nombre y apellido sean solo texto
+            if (!esSoloTexto(nombre) || !esSoloTexto(apellido)) {
+                JOptionPane.showMessageDialog(this, "Error: Nombre y Apellido deben contener solo letras.", "Error de Formato", JOptionPane.ERROR_MESSAGE);
+                return; // Detenemos la ejecución, pero NO limpiamos el formulario
+            }
 
-            // 4. Llamar a la lógica de negocio
+            // Llamar a la lógica de negocio
             gestor.registrarPiloto(dni, nombre, apellido, numComp, victorias, poles, vueltasRapidas, podios, pais);
 
-            // 5. Mostrar éxito y limpiar formulario
+            // Mostrar éxito y limpiar formulario
             JOptionPane.showMessageDialog(this, "Piloto " + apellido + " registrado exitosamente.", "Registro Exitoso", JOptionPane.INFORMATION_MESSAGE);
             limpiarFormulario();
 
@@ -136,7 +142,7 @@ public class PanelRegistroPiloto extends JPanel {
             // Error si los números están mal escritos
             JOptionPane.showMessageDialog(this, "Error: Los campos numéricos (victorias, podios, etc.) deben ser números válidos.", "Error de Formato", JOptionPane.ERROR_MESSAGE);
         } catch (PersonaRepetidaException ex) {
-            // Excepción personalizada de tu lógica
+            // Excepción personalizada de lógica
             JOptionPane.showMessageDialog(this, ex.getMessage(), "Error de Registro", JOptionPane.ERROR_MESSAGE);
         } catch (Exception ex) {
             // Cualquier otro error
@@ -155,4 +161,18 @@ public class PanelRegistroPiloto extends JPanel {
         txtPodios.setText("0");
         cmbPais.setSelectedIndex(0);
     }
-}
+
+    // ... (después de limpiarFormulario())
+
+    /**
+     * Método auxiliar para validar que un string contenga solo letras,
+     * espacios y caracteres acentuados comunes.
+     * @param texto El string a validar.
+     * @return true si solo contiene letras, false si contiene números o símbolos.
+     */
+    private boolean esSoloTexto(String texto) {
+        // expresión regular (regex) que valida letras (incluyendo áéíóúñ) y espacios.
+        return texto.matches("^[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+$");
+    }
+
+} 

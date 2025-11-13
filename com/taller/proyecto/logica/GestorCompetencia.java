@@ -55,11 +55,21 @@ public class GestorCompetencia {
 
     //Metodos necesarios para registrar nuevos objetos con sus respectivas excepciones y controles:
     public void registrarPiloto(String dni, String nombre, String apellido, int numeroCompetencia, int victorias, int polePosition, int vueltasRapidas, int podios, Pais pais) throws PersonaRepetidaException{
+        
+        // 1. Validar que el DNI no exista en la lista de PILOTOS
         for(Piloto p : pilotos){
             if(p.getDni().equals(dni)){
                 throw new PersonaRepetidaException("Este piloto ya se encuentra en la lista");
             }
         } 
+
+        // 2. Validar que el DNI no exista en la lista de MECÁNICOS
+        for(Mecanico m : mecanicos) {
+            if(m.getDni().equals(dni)) {
+                throw new PersonaRepetidaException("Error: El DNI " + dni + " ya está registrado como Mecánico.");
+            }
+        }
+
         Piloto piloto = new Piloto(dni, nombre, apellido, numeroCompetencia, victorias, polePosition, vueltasRapidas, podios, pais);
         this.pilotos.add(piloto);
     }
@@ -72,11 +82,21 @@ public class GestorCompetencia {
     }
 
     public void registrarMecanico(String dni, String nombre, String apellido, Pais pais, Especialidad especialidad, int añosExperiencia) throws PersonaRepetidaException{
+        
+        // 1. Validar que el DNI no exista en la lista de PILOTOS
+        for(Piloto p : pilotos) {
+            if(p.getDni().equals(dni)) {
+                throw new PersonaRepetidaException("Error: El DNI " + dni + " ya está registrado como Piloto.");
+            }
+        }
+        // 2. Validar que el DNI no exista en la lista de MECÁNICOS
         for(Mecanico m : mecanicos){
             if(m.getDni().equals(dni)){
                 throw new PersonaRepetidaException("Este mecánico ya se encuentra en la lista");
             }
         }
+        
+        // 3. Crear el mecánico si pasa ambas validaciones
         Mecanico mecanico = new Mecanico(dni, nombre, apellido, pais, especialidad, añosExperiencia);
         this.mecanicos.add(mecanico);
     }
@@ -85,6 +105,9 @@ public class GestorCompetencia {
         for(Escuderia e : escuderias){
             if(e.getNombre().equals(nombre)){
                 throw new EscuderiaRepetidaException("Esta escudería ya se encuentra en la lista");
+            }
+            if(e.getIdEscuderia() == idEscuderia){
+                throw new EscuderiaRepetidaException("Este ID ya se encuentra en uso");
             }
         }
         Escuderia escuderia = new Escuderia(nombre, pais, idEscuderia);
@@ -105,7 +128,7 @@ public class GestorCompetencia {
     public void registrarPais(int idPais, String descripcion) throws PaisRepetidoException{
         for(Pais p : paises){
             if(p.getIdPais() == idPais){
-                throw new PaisRepetidoException("Este País ya se encuentra en la lista");
+                throw new PaisRepetidoException("Este País ya se encuentra en la lista. Revisar ID.");
             }
         }
         Pais pais = new Pais(idPais, descripcion);
@@ -150,7 +173,7 @@ public class GestorCompetencia {
             // Si no encontramos un auto, puede ser por dos motivos:
             if (autosOcupadosEnEstaCarrera.isEmpty()) {
                  // 1. Porque no existe ningún auto con ese modelo (ej: "SF-99")
-                 // Usamos IllegalArgumentException (como el código original) para no añadir "throws Exception"
+                 // Usamos IllegalArgumentException para no añadir "throws Exception"
                  throw new IllegalArgumentException("No se encontró un auto con el modelo especificado: " + modelo);
             } else {
                  // 2. Porque sí existen, pero los 2 (o más) que hay ya están ocupados.
@@ -613,16 +636,4 @@ public void asociarPilotoAEscuderia(String dniPiloto, String nombreEscuderia, St
 
     System.out.println("Asociación exitosa: Piloto " + piloto.getApellido() + " vinculado a " + escuderia.getNombre() + " de " + desdeFecha + " a " + hastaFecha + ".");
   }
-
-
-
-
-
-
-
-
-
-
-
-
 }
